@@ -1,0 +1,9 @@
+name: ${project.name}
+version: ${project.version}
+description: ${project.description}
+author: Kenny
+main: me.kenny.emcdisguise.EMCDisguise
+commands:
+  disguise:
+    aliases: [dis, d]
+    description: Disguises you.
