@@ -1,18 +1,25 @@
 package me.kenny.emcdisguise;
 
+import me.libraryaddict.disguise.disguisetypes.DisguiseType;
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.material.Colorable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class DisguiseGui implements Listener {
     private EMCDisguise emcDisguise;
@@ -52,11 +59,39 @@ public class DisguiseGui implements Listener {
             inventory.setItem(i + 1, pane);
             i = i + 2;
         }
+
+        ItemStack exit = new ItemStack(Material.BARRIER);
+        ItemMeta itemMeta = exit.getItemMeta();
+        itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', emcDisguise.getLocaleDisguiseExitButton()));
+        exit.setItemMeta(itemMeta);
+        inventory.setItem(inventory.getSize() - 1, exit);
         return inventory;
     }
 
-    public Inventory getGui() {
-        return gui;
+    public Inventory getGui(Player player) {
+        Inventory clone = Bukkit.createInventory(null, gui.getSize(), gui.getTitle());
+        clone.setContents(gui.getContents());
+
+        for (ItemStack itemStack : clone.getContents()) {
+            if (itemStack != null && itemStack.getType() == Material.SKULL_ITEM) {
+                String entity = ChatColor.stripColor(itemStack.getItemMeta().getDisplayName()).replace(" Disguise", "");
+                entity = entity.toLowerCase().replace(" ", "_");
+                if (!player.hasPermission("disguise." + entity)) {
+                    ItemMeta itemMeta = itemStack.getItemMeta();
+                    String message = emcDisguise.getLocaleNoDisguisePermission();
+                    itemMeta.setLore(Arrays.asList(ChatColor.translateAlternateColorCodes('&', message)));
+                    itemStack.setItemMeta(itemMeta);
+                }
+
+                if (emcDisguise.isDisguised(player) && emcDisguise.getPlayerDisguiseType(player).toString().equals(entity.toUpperCase())) {
+                    itemStack.addUnsafeEnchantment(Enchantment.DURABILITY, 3);
+                    ItemMeta itemMeta = itemStack.getItemMeta();
+                    itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                    itemStack.setItemMeta(itemMeta);
+                }
+            }
+        }
+        return clone;
     }
 
     public ItemStack getHeadItemStack(String entity) {
@@ -91,6 +126,30 @@ public class DisguiseGui implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getInventory().getTitle().equals(ChatColor.translateAlternateColorCodes('&', emcDisguise.getLocaleDisguiseGuiTitle()))) {
             event.setCancelled(true);
+
+            ItemStack clicked = event.getCurrentItem();
+            Player player = (Player) event.getWhoClicked();
+            if (clicked != null) {
+                if (clicked.getType() == Material.SKULL_ITEM) {
+                    String entity = ChatColor.stripColor(clicked.getItemMeta().getDisplayName()).replace(" Disguise", "");
+                    String enumEntity = entity.toUpperCase().replace(" ", "_");
+                    if (player.hasPermission("disguise." + enumEntity.toLowerCase())) {
+                        if (!emcDisguise.isDisguised(player)) {
+                            emcDisguise.addDisguise(player, DisguiseType.valueOf(enumEntity));
+                        } else {
+                            if (!enumEntity.equals(emcDisguise.getPlayerDisguiseType(player).toString())) {
+                                emcDisguise.removeDisguise(player);
+                                emcDisguise.addDisguise(player, DisguiseType.valueOf(enumEntity));
+                            } else {
+                                emcDisguise.removeDisguise(player);
+                            }
+                        }
+                        player.closeInventory();
+                    }
+                } else if (clicked.getType() == Material.BARRIER) {
+                    player.closeInventory();
+                }
+            }
         }
     }
 }

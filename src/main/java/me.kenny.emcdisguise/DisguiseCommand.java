@@ -18,7 +18,7 @@ public class DisguiseCommand implements CommandExecutor {
         if (sender instanceof Player) {
             Player player = (Player) sender;
 
-            player.openInventory(emcDisguise.getDisguiseGui().getGui());
+            player.openInventory(emcDisguise.getDisguiseGui().getGui(player));
         } else {
             sender.sendMessage(ChatColor.RED + "You must be a player to execute this command!");
         }
