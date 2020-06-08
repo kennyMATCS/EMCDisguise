@@ -33,7 +33,7 @@ public class DisguiseGui implements Listener {
     }
 
     private Inventory createDisguiseGui() {
-        Inventory inventory = Bukkit.createInventory(null, emcDisguise.getConfigDisguisesGuiSize(), ChatColor.translateAlternateColorCodes('&', emcDisguise.getLocaleDisguiseGuiTitle()));
+        Inventory inventory = Bukkit.createInventory(null, 36, ChatColor.translateAlternateColorCodes('&', emcDisguise.getLocaleDisguiseGuiTitle()));
         ItemStack pane = new ItemStack(Material.STAINED_GLASS_PANE);
 
         String color = emcDisguise.getConfigDisguiseGuiPaneColor();
@@ -53,18 +53,34 @@ public class DisguiseGui implements Listener {
             pane.setDurability((short) DyeColor.GRAY.getWoolData());
         }
 
-        int i = 0;
-        for (String entity : emcDisguise.getConfigDisguises()) {
-            inventory.setItem(i, getHeadItemStack(entity));
-            inventory.setItem(i + 1, pane);
-            i = i + 2;
+        for (int i = 0; i < 9; i++) {
+            inventory.setItem(i, pane);
         }
 
+        for (int i = 18; i < 27; i++) {
+            inventory.setItem(i, pane);
+        }
+
+        for (int i = 27; i < 36; i++) {
+            if (i != 30 && i != 32)
+                inventory.setItem(i, pane);
+        }
+
+        ItemStack toggleNameTag = new ItemStack(Material.PAPER);
+        ItemMeta toggleNameTagItemMeta = toggleNameTag.getItemMeta();
+        toggleNameTagItemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', emcDisguise.getLocaleDisguiseGuiToggleNameTagButton()));
+        toggleNameTag.setItemMeta(toggleNameTagItemMeta);
+        inventory.setItem(32, toggleNameTag);
+
         ItemStack exit = new ItemStack(Material.BARRIER);
-        ItemMeta itemMeta = exit.getItemMeta();
-        itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', emcDisguise.getLocaleDisguiseExitButton()));
-        exit.setItemMeta(itemMeta);
-        inventory.setItem(inventory.getSize() - 1, exit);
+        ItemMeta exitItemMeta = exit.getItemMeta();
+        exitItemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', emcDisguise.getLocaleDisguiseGuiExitButton()));
+        exit.setItemMeta(exitItemMeta);
+        inventory.setItem(30, exit);
+
+        for (String entity : emcDisguise.getConfigDisguises()) {
+            inventory.addItem(getHeadItemStack(entity));
+        }
         return inventory;
     }
 
@@ -138,15 +154,18 @@ public class DisguiseGui implements Listener {
                             emcDisguise.addDisguise(player, DisguiseType.valueOf(enumEntity));
                         } else {
                             if (!enumEntity.equals(emcDisguise.getPlayerDisguiseType(player).toString())) {
-                                emcDisguise.removeDisguise(player);
+                                emcDisguise.removeDisguise(player, true);
                                 emcDisguise.addDisguise(player, DisguiseType.valueOf(enumEntity));
                             } else {
-                                emcDisguise.removeDisguise(player);
+                                emcDisguise.removeDisguise(player, true);
                             }
                         }
                         player.closeInventory();
                     }
                 } else if (clicked.getType() == Material.BARRIER) {
+                    player.closeInventory();
+                } else if (clicked.getType() == Material.PAPER) {
+                    emcDisguise.toggleNameTag(player);
                     player.closeInventory();
                 }
             }

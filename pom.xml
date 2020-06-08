@@ -6,7 +6,7 @@
 
     <groupId>me.kenny</groupId>
     <artifactId>emcdisguise</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
     <name>EMCDisguise</name>
     <description>Disguises players as entities</description>
     <build>
@@ -21,6 +21,7 @@
                     <include>plugin.yml</include>
                     <include>config.yml</include>
                     <include>locale.yml</include>
+                    <include>nameTagToggled.yml</include>
                 </includes>
             </resource>
         </resources>

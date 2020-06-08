@@ -1,5 +1,6 @@
 package me.kenny.emcdisguise;
 
+import com.google.common.collect.Lists;
 import me.libraryaddict.disguise.DisguiseAPI;
 import me.libraryaddict.disguise.disguisetypes.DisguiseType;
 import me.libraryaddict.disguise.disguisetypes.MobDisguise;
@@ -15,13 +16,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class EMCDisguise extends JavaPlugin {
     private FileConfiguration localeFileConfiguration;
+    private FileConfiguration nameTagToggledFileConfiguration;
+    private File nameTagToggledFile;
 
     private String localeNoDisguisePermission;
     private String localeClickToUseDisguise;
@@ -29,13 +29,18 @@ public class EMCDisguise extends JavaPlugin {
     private String localeNowDisguised;
     private String localeDisguiseDisplayName;
     private String localeDisguiseGuiTitle;
-    private String localeDisguiseExitButton;
+    private String localeDisguiseGuiExitButton;
+    private String localeDisguiseGuiToggleNameTagButton;
+    private String localeDisguiseToggleNametag;
+    private String localeDisguiseCommandInvalidDisguise;
+    private String localeUndisguiseCommandNotWearingDisguise;
+    private String localeDisguiseRemoveBecauseAttacked;
 
-    private int configDisguiseGuiSize;
     private String configDisguiseGuiPaneColor;
     private List<String> configDisguises;
 
     private DisguiseGui disguiseGui;
+    private ArmorStandConstructor armorStandConstructor;
 
     private Map<Player, DisguiseType> disguised = new HashMap<>();
 
@@ -43,6 +48,7 @@ public class EMCDisguise extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
         createLocaleConfig();
+        createNameTagToggledConfig();
 
         localeNoDisguisePermission = localeFileConfiguration.getString("no-disguise-permission");
         localeClickToUseDisguise = localeFileConfiguration.getString("click-to-use-disguise");
@@ -50,9 +56,13 @@ public class EMCDisguise extends JavaPlugin {
         localeNowDisguised = localeFileConfiguration.getString("now-disguised");
         localeDisguiseDisplayName = localeFileConfiguration.getString("disguise-display-name");
         localeDisguiseGuiTitle = localeFileConfiguration.getString("disguise-gui-title");
-        localeDisguiseExitButton = localeFileConfiguration.getString("disguise-exit-button");
+        localeDisguiseGuiExitButton = localeFileConfiguration.getString("disguise-gui-exit-button");
+        localeDisguiseGuiToggleNameTagButton = localeFileConfiguration.getString("disguise-gui-toggle-nametag-button");
+        localeDisguiseToggleNametag = localeFileConfiguration.getString("disguise-toggle-nametag");
+        localeDisguiseCommandInvalidDisguise = localeFileConfiguration.getString("disguise-command-invalid-disguise");
+        localeUndisguiseCommandNotWearingDisguise = localeFileConfiguration.getString("undisguise-command-not-wearing-disguise");
+        localeDisguiseRemoveBecauseAttacked = localeFileConfiguration.getString("disguise-remove-because-attacked");
 
-        configDisguiseGuiSize = getConfig().getInt("disguise-gui-size");
         configDisguiseGuiPaneColor = getConfig().getString("disguise-gui-pane-color");
         configDisguises = getConfig().getStringList("disguises");
 
@@ -68,11 +78,20 @@ public class EMCDisguise extends JavaPlugin {
         configDisguises.removeAll(remove);
 
         disguiseGui = new DisguiseGui(this);
+        armorStandConstructor = new ArmorStandConstructor(this);
 
         getServer().getPluginManager().registerEvents(disguiseGui, this);
+        getServer().getPluginManager().registerEvents(armorStandConstructor, this);
         getServer().getPluginManager().registerEvents(new DisguiseListener(this), this);
 
         getCommand("disguise").setExecutor(new DisguiseCommand(this));
+        getCommand("disguise").setTabCompleter(new DisguiseTabCompleter(this));
+        getCommand("undisguise").setExecutor(new UndisguiseCommand(this));
+    }
+
+    @Override
+    public void onDisable() {
+        armorStandConstructor.removeAll();
     }
 
     private void createLocaleConfig() {
@@ -86,6 +105,22 @@ public class EMCDisguise extends JavaPlugin {
 
         try {
             localeFileConfiguration.load(localeFile);
+        } catch (IOException | InvalidConfigurationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createNameTagToggledConfig() {
+        nameTagToggledFile = new File(getDataFolder(), "nameTagToggled.yml");
+        if (!nameTagToggledFile.exists()) {
+            nameTagToggledFile.getParentFile().mkdirs();
+            saveResource("nameTagToggled.yml", false);
+        }
+
+        nameTagToggledFileConfiguration = new YamlConfiguration();
+
+        try {
+            nameTagToggledFileConfiguration.load(nameTagToggledFile);
         } catch (IOException | InvalidConfigurationException e) {
             e.printStackTrace();
         }
@@ -115,16 +150,32 @@ public class EMCDisguise extends JavaPlugin {
         return localeDisguiseGuiTitle;
     }
 
-    public String getLocaleDisguiseExitButton() {
-        return localeDisguiseExitButton;
+    public String getLocaleDisguiseGuiExitButton() {
+        return localeDisguiseGuiExitButton;
+    }
+
+    public String getLocaleDisguiseGuiToggleNameTagButton() {
+        return localeDisguiseGuiToggleNameTagButton;
+    }
+
+    public String getLocaleDisguiseCommandInvalidDisguise() {
+        return localeDisguiseCommandInvalidDisguise;
+    }
+
+    public String getLocaleUndisguiseCommandNotWearingDisguise() {
+        return localeUndisguiseCommandNotWearingDisguise;
+    }
+
+    public String getLocaleDisguiseRemoveBecauseAttacked() {
+        return localeDisguiseRemoveBecauseAttacked;
     }
 
     public String getConfigDisguiseGuiPaneColor() {
         return configDisguiseGuiPaneColor;
     }
 
-    public Integer getConfigDisguisesGuiSize() {
-        return configDisguiseGuiSize;
+    public String getLocaleDisguiseToggleNametag() {
+        return localeDisguiseToggleNametag;
     }
 
     public List<String> getConfigDisguises() {
@@ -135,27 +186,78 @@ public class EMCDisguise extends JavaPlugin {
         return disguiseGui;
     }
 
+    public void toggleNameTag(Player player) {
+        boolean isToggled = isNameTagToggled(player);
+        String on_off = isToggled ? "off" : "on";
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', getLocaleDisguiseToggleNametag().replace("%on_off%", on_off)));
+        if (isToggled)
+            removeNameTagToggled(player);
+        else
+            addNameTagToggled(player);
+    }
+
+    public boolean isNameTagToggled(Player player) {
+        return nameTagToggledFileConfiguration.getStringList("players").contains(player.getUniqueId().toString());
+    }
+
+    public void addNameTagToggled(Player player) {
+        String uuid = player.getUniqueId().toString();
+        List<String> toggled = nameTagToggledFileConfiguration.getStringList("players");
+        if (!toggled.contains(uuid)) {
+            toggled.add(uuid);
+            nameTagToggledFileConfiguration.set("players", toggled);
+            armorStandConstructor.update(player);
+
+            try {
+                nameTagToggledFileConfiguration.save(nameTagToggledFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void removeNameTagToggled(Player player) {
+        String uuid = player.getUniqueId().toString();
+        List<String> toggled = nameTagToggledFileConfiguration.getStringList("players");
+        if (toggled.contains(uuid)) {
+            toggled.remove(uuid);
+            nameTagToggledFileConfiguration.set("players", toggled);
+            armorStandConstructor.update(player);
+
+            try {
+                nameTagToggledFileConfiguration.save(nameTagToggledFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void addDisguise(Player player, DisguiseType disguiseType) {
         if (!disguised.containsKey(player)) {
             String entity = WordUtils.capitalizeFully(disguiseType.toString().replace("_", " "));
             String localeNowDisguised = ChatColor.translateAlternateColorCodes('&', getLocaleNowDisguised().replace("%entity%", entity));
             player.sendMessage(localeNowDisguised);
             MobDisguise mobDisguise = new MobDisguise(disguiseType);
+            mobDisguise.setViewSelfDisguise(false);
             mobDisguise.setEntity(player);
             mobDisguise.startDisguise();
+
+            armorStandConstructor.addArmorstand(player);
             disguised.put(player, disguiseType);
         }
     }
 
-    public void removeDisguise(Player player) {
+    public void removeDisguise(Player player, boolean message) {
         if (disguised.containsKey(player)) {
             if (DisguiseAPI.isDisguised(player)) {
                 String currentDisguise = getPlayerDisguiseType(player).toString().replace("_", " ");
                 currentDisguise = WordUtils.capitalizeFully(currentDisguise);
                 String localeRemoveDisguise = ChatColor.translateAlternateColorCodes('&', getLocaleRemoveDisguise().replace("%entity%", currentDisguise));
-                player.sendMessage(localeRemoveDisguise);
+                if (message)
+                    player.sendMessage(localeRemoveDisguise);
                 DisguiseAPI.undisguiseToAll(player);
             }
+            armorStandConstructor.removeArmorStand(player);
             disguised.remove(player);
         }
     }
