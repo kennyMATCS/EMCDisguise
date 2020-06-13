@@ -85,7 +85,7 @@ public class EMCDisguise extends JavaPlugin {
         localeDisguiseGuiToggleNameTagButton = localeFileConfiguration.getString("disguise-gui-toggle-nametag-button");
         localeDisguiseGuiToggleNameTagButtonLore = getTranslatedLore(localeFileConfiguration.getStringList("disguise-gui-toggle-nametag-button-lore"));
         localeDisguiseGuiPerspectiveButton = localeFileConfiguration.getString("disguise-gui-perspective-button");
-        localeDisguiseGuiPerspectiveButtonLore = getTranslatedLore(localeFileConfiguration.getStringList("disguise-gui-perspective-lore"));
+        localeDisguiseGuiPerspectiveButtonLore = getTranslatedLore(localeFileConfiguration.getStringList("disguise-gui-perspective-button-lore"));
         localeDisguiseTogglePerspective = localeFileConfiguration.getString("disguise-toggle-perspective");
         localeDisguiseToggleNametag = localeFileConfiguration.getString("disguise-toggle-nametag");
         localeDisguiseCommandInvalidDisguise = localeFileConfiguration.getString("disguise-command-invalid-disguise");
