@@ -4,9 +4,31 @@ remove-disguise: "&cRemoved your &4%entity% &cdisguise."
 now-disguised: "&eYou are now disguised as a(n) &6%entity%&e."
 disguise-display-name: "&6%entity% &eDisguise"
 disguise-gui-title: "&bEMC &3Disguises"
-disguise-gui-exit-button: "&cExit."
-disguise-gui-toggle-nametag-button: "&cToggle Nametag."
+disguise-gui-undisguise-button: "&cUndisguise"
+disguise-gui-undisguise-button-lore:
+  - "&eUndisguises you."
+disguise-gui-toggle-nametag-button: "&cToggle Nametag"
+disguise-gui-toggle-nametag-button-lore:
+  - "&eToggles if your nametag is displayed while disguised."
 disguise-toggle-nametag: "&eDisguise nametag has been toggled &6%on_off%&e."
+disguise-gui-perspective-button: "&cToggle Perspective"
+disguise-gui-perspective-button-lore:
+  - "&eToggles if you see yourself while disguised."
+disguise-toggle-perspective: "&eDisguise perspective has been toggled &6%on_off%&e."
 disguise-command-invalid-disguise: "&cThat is not a valid disguise!"
 undisguise-command-not-wearing-disguise: "&cYou are not wearing a disguise!"
 disguise-remove-because-attacked: "&cYou were attacked and your &4%entity% &cdisguise was removed!"
+disguise-information-lore:
+  - "&e/disguise - Opens this menu."
+  - "&e/undisguise - Undisguises you."
+  - "&e/disguise name - Toggles your disguise nametag."
+  - "&e/disguise perspective - Toggles if you see your "
+  - "&e                               own player while disguised or not."
+  - "&e/disguise <entity>&e - Disguises you as the specified entity."
+disguise-information-display-name: "&cInformation"
+disguise-gui-pane-color1-displayname: " "
+disguise-gui-pane-color1-lore:
+  - " "
+disguise-gui-pane-color2-displayname: " "
+disguise-gui-pane-color2-lore:
+  - " "

@@ -4,9 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
     <groupId>me.kenny</groupId>
     <artifactId>emcdisguise</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
     <name>EMCDisguise</name>
     <description>Disguises players as entities</description>
     <build>
@@ -22,6 +25,7 @@
                     <include>config.yml</include>
                     <include>locale.yml</include>
                     <include>nameTagToggled.yml</include>
+                    <include>showSelf.yml</include>
                 </includes>
             </resource>
         </resources>
@@ -50,7 +54,7 @@
         <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
-            <version>4.4.0</version>
+            <version>4.4.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <repositories>

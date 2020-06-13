@@ -5,7 +5,7 @@ author: Kenny
 main: me.kenny.emcdisguise.EMCDisguise
 commands:
   disguise:
-    aliases: [dis, d]
+    aliases: [dis]
     description: Disguises you.
   undisguise:
     description: Undisguises you.

@@ -1,5 +1,6 @@
-package me.kenny.emcdisguise;
+package me.kenny.emcdisguise.armorstand;
 
+import me.kenny.emcdisguise.EMCDisguise;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;

@@ -1,4 +1,5 @@
-disguise-gui-pane-color: GRAY
+disguise-gui-pane-color1: BLACK
+disguise-gui-pane-color2: RED
 disguises:
   - Cow
   - Chicken

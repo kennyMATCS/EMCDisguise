@@ -1,5 +1,6 @@
-package me.kenny.emcdisguise;
+package me.kenny.emcdisguise.command;
 
+import me.kenny.emcdisguise.EMCDisguise;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

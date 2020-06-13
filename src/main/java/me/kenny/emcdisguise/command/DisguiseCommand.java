@@ -1,5 +1,6 @@
-package me.kenny.emcdisguise;
+package me.kenny.emcdisguise.command;
 
+import me.kenny.emcdisguise.EMCDisguise;
 import me.libraryaddict.disguise.disguisetypes.DisguiseType;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -22,6 +23,16 @@ public class DisguiseCommand implements CommandExecutor {
             Player player = (Player) sender;
 
             if (args.length == 1) {
+                if (args[0].equalsIgnoreCase("name")) {
+                    emcDisguise.toggleNameTag(player);
+                    return true;
+                }
+
+                if (args[0].equalsIgnoreCase("perspective")) {
+                    emcDisguise.togglePerspective(player);
+                    return true;
+                }
+
                 List<String> disguises = emcDisguise.getConfigDisguises();
                 for (String disguise : disguises) {
                     if (disguise.toLowerCase().equals(args[0].toLowerCase())) {

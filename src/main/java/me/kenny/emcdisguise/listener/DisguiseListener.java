@@ -1,5 +1,6 @@
-package me.kenny.emcdisguise;
+package me.kenny.emcdisguise.listener;
 
+import me.kenny.emcdisguise.EMCDisguise;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
