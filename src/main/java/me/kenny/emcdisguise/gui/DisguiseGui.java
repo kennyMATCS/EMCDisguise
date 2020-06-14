@@ -201,8 +201,10 @@ public class DisguiseGui implements Listener {
                                     emcDisguise.removeDisguise(player, true);
                                 }
                             }
-                            player.closeInventory();
+                        } else {
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', emcDisguise.getLocaleDisguiseGuiNoPermissionOnExit()));
                         }
+                        player.closeInventory();
                         break;
                     case BARRIER:
                         if (emcDisguise.isDisguised(player)) {
@@ -218,6 +220,7 @@ public class DisguiseGui implements Listener {
                         break;
                     case SADDLE:
                         emcDisguise.togglePerspective(player);
+                        player.closeInventory();
                         break;
                     default:
                         break;

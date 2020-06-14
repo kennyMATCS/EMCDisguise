@@ -28,10 +28,13 @@ public class DisguiseTabCompleter implements TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
+            Player player = (Player) sender;
             if (args.length == 1) {
                 List<String> finalCompletions = new ArrayList<>();
                 StringUtil.copyPartialMatches(args[0], completions, finalCompletions);
                 finalCompletions.addAll(Arrays.asList("perspective", "name"));
+                if (player.hasPermission("disguise.manage"))
+                    finalCompletions.add("reload");
                 Collections.sort(finalCompletions);
                 return finalCompletions;
             }

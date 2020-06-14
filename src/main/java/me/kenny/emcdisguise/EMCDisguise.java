@@ -27,18 +27,21 @@ import java.io.IOException;
 import java.util.*;
 
 public class EMCDisguise extends JavaPlugin {
+    private File localeFile;
     private FileConfiguration localeFileConfiguration;
     private File nameTagToggledFile;
     private FileConfiguration nameTagToggledFileConfiguration;
     private File showSelfFile;
     private FileConfiguration showSelfFileConfiguration;
 
+    private String localeReloadMessage;
     private String localeNoDisguisePermission;
     private String localeClickToUseDisguise;
     private String localeRemoveDisguise;
     private String localeNowDisguised;
     private String localeDisguiseDisplayName;
     private String localeDisguiseGuiTitle;
+    private String localeDisguiseGuiNoPermissionOnExit;
     private String localeDisguiseGuiUndisguiseButton;
     private List<String> localeDisguiseGuiUndisguiseButtonLore;
     private String localeDisguiseGuiToggleNameTagButton;
@@ -74,33 +77,7 @@ public class EMCDisguise extends JavaPlugin {
         createNameTagToggledConfig();
         createShowSelfConfig();
 
-        localeNoDisguisePermission = localeFileConfiguration.getString("no-disguise-permission");
-        localeClickToUseDisguise = localeFileConfiguration.getString("click-to-use-disguise");
-        localeRemoveDisguise = localeFileConfiguration.getString("remove-disguise");
-        localeNowDisguised = localeFileConfiguration.getString("now-disguised");
-        localeDisguiseDisplayName = localeFileConfiguration.getString("disguise-display-name");
-        localeDisguiseGuiTitle = localeFileConfiguration.getString("disguise-gui-title");
-        localeDisguiseGuiUndisguiseButton = localeFileConfiguration.getString("disguise-gui-undisguise-button");
-        localeDisguiseGuiUndisguiseButtonLore = getTranslatedLore(localeFileConfiguration.getStringList("disguise-gui-undisguise-button-lore"));
-        localeDisguiseGuiToggleNameTagButton = localeFileConfiguration.getString("disguise-gui-toggle-nametag-button");
-        localeDisguiseGuiToggleNameTagButtonLore = getTranslatedLore(localeFileConfiguration.getStringList("disguise-gui-toggle-nametag-button-lore"));
-        localeDisguiseGuiPerspectiveButton = localeFileConfiguration.getString("disguise-gui-perspective-button");
-        localeDisguiseGuiPerspectiveButtonLore = getTranslatedLore(localeFileConfiguration.getStringList("disguise-gui-perspective-button-lore"));
-        localeDisguiseTogglePerspective = localeFileConfiguration.getString("disguise-toggle-perspective");
-        localeDisguiseToggleNametag = localeFileConfiguration.getString("disguise-toggle-nametag");
-        localeDisguiseCommandInvalidDisguise = localeFileConfiguration.getString("disguise-command-invalid-disguise");
-        localeUndisguiseCommandNotWearingDisguise = localeFileConfiguration.getString("undisguise-command-not-wearing-disguise");
-        localeDisguiseRemoveBecauseAttacked = localeFileConfiguration.getString("disguise-remove-because-attacked");
-        localeDisguiseInformationLore = getTranslatedLore(localeFileConfiguration.getStringList("disguise-information-lore"));
-        localeDisguiseInformationDisplayName = localeFileConfiguration.getString("disguise-information-display-name");
-        localeDisguiseGuiPaneColor1DisplayName = localeFileConfiguration.getString("disguise-gui-pane-color1-displayname");
-        localeDisguiseGuiPaneColor1Lore = getTranslatedLore(localeFileConfiguration.getStringList("disguise-gui-pane-color1-lore"));
-        localeDisguiseGuiPaneColor2DisplayName = localeFileConfiguration.getString("disguise-gui-pane-color2-displayname");
-        localeDisguiseGuiPaneColor2Lore = getTranslatedLore(localeFileConfiguration.getStringList("disguise-gui-pane-color2-lore"));
-
-        configDisguiseGuiPaneColor1 = getConfig().getString("disguise-gui-pane-color1");
-        configDisguiseGuiPaneColor2 = getConfig().getString("disguise-gui-pane-color2");
-        configDisguises = getConfig().getStringList("disguises");
+        initConfigs();
 
         List<String> remove = new ArrayList<>();
         for (String entity : configDisguises) {
@@ -132,7 +109,49 @@ public class EMCDisguise extends JavaPlugin {
         armorStandConstructor.removeAll();
     }
 
+    public void reloadConfigs() {
+        reloadConfig();
+        localeFileConfiguration = YamlConfiguration.loadConfiguration(localeFile);
+        showSelfFileConfiguration = YamlConfiguration.loadConfiguration(showSelfFile);
+        nameTagToggledFileConfiguration = YamlConfiguration.loadConfiguration(nameTagToggledFile);
+
+        initConfigs();
+    }
+
+    public void initConfigs() {
+        localeReloadMessage = localeFileConfiguration.getString("reload-message");
+        localeNoDisguisePermission = localeFileConfiguration.getString("no-disguise-permission");
+        localeClickToUseDisguise = localeFileConfiguration.getString("click-to-use-disguise");
+        localeRemoveDisguise = localeFileConfiguration.getString("remove-disguise");
+        localeNowDisguised = localeFileConfiguration.getString("now-disguised");
+        localeDisguiseDisplayName = localeFileConfiguration.getString("disguise-display-name");
+        localeDisguiseGuiTitle = localeFileConfiguration.getString("disguise-gui-title");
+        localeDisguiseGuiNoPermissionOnExit = localeFileConfiguration.getString("disguise-gui-no-permission-on-exit");
+        localeDisguiseGuiUndisguiseButton = localeFileConfiguration.getString("disguise-gui-undisguise-button");
+        localeDisguiseGuiUndisguiseButtonLore = getTranslatedLore(localeFileConfiguration.getStringList("disguise-gui-undisguise-button-lore"));
+        localeDisguiseGuiToggleNameTagButton = localeFileConfiguration.getString("disguise-gui-toggle-nametag-button");
+        localeDisguiseGuiToggleNameTagButtonLore = getTranslatedLore(localeFileConfiguration.getStringList("disguise-gui-toggle-nametag-button-lore"));
+        localeDisguiseGuiPerspectiveButton = localeFileConfiguration.getString("disguise-gui-perspective-button");
+        localeDisguiseGuiPerspectiveButtonLore = getTranslatedLore(localeFileConfiguration.getStringList("disguise-gui-perspective-button-lore"));
+        localeDisguiseTogglePerspective = localeFileConfiguration.getString("disguise-toggle-perspective");
+        localeDisguiseToggleNametag = localeFileConfiguration.getString("disguise-toggle-nametag");
+        localeDisguiseCommandInvalidDisguise = localeFileConfiguration.getString("disguise-command-invalid-disguise");
+        localeUndisguiseCommandNotWearingDisguise = localeFileConfiguration.getString("undisguise-command-not-wearing-disguise");
+        localeDisguiseRemoveBecauseAttacked = localeFileConfiguration.getString("disguise-remove-because-attacked");
+        localeDisguiseInformationLore = getTranslatedLore(localeFileConfiguration.getStringList("disguise-information-lore"));
+        localeDisguiseInformationDisplayName = localeFileConfiguration.getString("disguise-information-display-name");
+        localeDisguiseGuiPaneColor1DisplayName = localeFileConfiguration.getString("disguise-gui-pane-color1-displayname");
+        localeDisguiseGuiPaneColor1Lore = getTranslatedLore(localeFileConfiguration.getStringList("disguise-gui-pane-color1-lore"));
+        localeDisguiseGuiPaneColor2DisplayName = localeFileConfiguration.getString("disguise-gui-pane-color2-displayname");
+        localeDisguiseGuiPaneColor2Lore = getTranslatedLore(localeFileConfiguration.getStringList("disguise-gui-pane-color2-lore"));
+
+        configDisguiseGuiPaneColor1 = getConfig().getString("disguise-gui-pane-color1");
+        configDisguiseGuiPaneColor2 = getConfig().getString("disguise-gui-pane-color2");
+        configDisguises = getConfig().getStringList("disguises");
+    }
+
     public void setupPermissions() {
+        Bukkit.getServer().getPluginManager().addPermission(new Permission("disguise.manage", PermissionDefault.OP));
         for (String disguise : getConfigDisguises()) {
             Permission permission = new Permission("disguise" + disguise.toLowerCase(), PermissionDefault.OP);
             Bukkit.getServer().getPluginManager().addPermission(permission);
@@ -148,7 +167,7 @@ public class EMCDisguise extends JavaPlugin {
     }
 
     private void createLocaleConfig() {
-        File localeFile = new File(getDataFolder(), "locale.yml");
+        localeFile = new File(getDataFolder(), "locale.yml");
         if (!localeFile.exists()) {
             localeFile.getParentFile().mkdirs();
             saveResource("locale.yml", false);
@@ -209,6 +228,10 @@ public class EMCDisguise extends JavaPlugin {
         }
     }
 
+    public String getLocaleReloadMessage() {
+        return localeReloadMessage;
+    }
+
     public String getLocaleNoDisguisePermission() {
         return localeNoDisguisePermission;
     }
@@ -231,6 +254,10 @@ public class EMCDisguise extends JavaPlugin {
 
     public String getLocaleDisguiseGuiTitle() {
         return localeDisguiseGuiTitle;
+    }
+
+    public String getLocaleDisguiseGuiNoPermissionOnExit() {
+        return localeDisguiseGuiNoPermissionOnExit;
     }
 
     public String getLocaleDisguiseGuiUndisguiseButton() {
@@ -410,7 +437,8 @@ public class EMCDisguise extends JavaPlugin {
             String localeNowDisguised = ChatColor.translateAlternateColorCodes('&', getLocaleNowDisguised().replace("%entity%", entity));
             player.sendMessage(localeNowDisguised);
             MobDisguise mobDisguise = new MobDisguise(disguiseType);
-            mobDisguise.setShowName(true);
+            if (isShowSelf(player))
+                mobDisguise.setViewSelfDisguise(false);
             mobDisguise.setEntity(player);
             mobDisguise.startDisguise();
 

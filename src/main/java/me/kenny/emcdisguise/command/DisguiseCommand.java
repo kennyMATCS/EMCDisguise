@@ -21,40 +21,45 @@ public class DisguiseCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-
             if (args.length == 1) {
-                if (args[0].equalsIgnoreCase("name")) {
-                    emcDisguise.toggleNameTag(player);
-                    return true;
-                }
-
-                if (args[0].equalsIgnoreCase("perspective")) {
-                    emcDisguise.togglePerspective(player);
-                    return true;
-                }
-
-                List<String> disguises = emcDisguise.getConfigDisguises();
-                for (String disguise : disguises) {
-                    if (disguise.toLowerCase().equals(args[0].toLowerCase())) {
-                        if (!player.hasPermission("disguise." + disguise.toLowerCase())) {
-                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', emcDisguise.getLocaleNoDisguisePermission()));
-                        } else {
-                            String enumEntity = disguise.toUpperCase();
-                            if (!emcDisguise.isDisguised(player)) {
-                                emcDisguise.addDisguise(player, DisguiseType.valueOf(enumEntity));
-                            } else {
-                                if (!enumEntity.equals(emcDisguise.getPlayerDisguiseType(player).toString())) {
-                                    emcDisguise.removeDisguise(player, true);
-                                    emcDisguise.addDisguise(player, DisguiseType.valueOf(enumEntity));
+                switch(args[0]) {
+                    case "name":
+                        emcDisguise.toggleNameTag(player);
+                        break;
+                    case "perspective":
+                        emcDisguise.togglePerspective(player);
+                        break;
+                    case "reload":
+                        if (player.hasPermission("disguise.manage")) {
+                            emcDisguise.reloadConfigs();
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', emcDisguise.getLocaleReloadMessage()));
+                        }
+                        break;
+                    default:
+                        List<String> disguises = emcDisguise.getConfigDisguises();
+                        for (String disguise : disguises) {
+                            if (disguise.toLowerCase().equals(args[0].toLowerCase())) {
+                                if (!player.hasPermission("disguise." + disguise.toLowerCase())) {
+                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', emcDisguise.getLocaleNoDisguisePermission()));
                                 } else {
-                                    emcDisguise.removeDisguise(player, true);
+                                    String enumEntity = disguise.toUpperCase();
+                                    if (!emcDisguise.isDisguised(player)) {
+                                        emcDisguise.addDisguise(player, DisguiseType.valueOf(enumEntity));
+                                    } else {
+                                        if (!enumEntity.equals(emcDisguise.getPlayerDisguiseType(player).toString())) {
+                                            emcDisguise.removeDisguise(player, true);
+                                            emcDisguise.addDisguise(player, DisguiseType.valueOf(enumEntity));
+                                        } else {
+                                            emcDisguise.removeDisguise(player, true);
+                                        }
+                                    }
                                 }
+                                return true;
                             }
                         }
-                        return true;
-                    }
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', emcDisguise.getLocaleDisguiseCommandInvalidDisguise()));
+                        break;
                 }
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', emcDisguise.getLocaleDisguiseCommandInvalidDisguise()));
             } else {
                 player.openInventory(emcDisguise.getDisguiseGui().getGui(player));
             }

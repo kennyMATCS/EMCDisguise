@@ -1,9 +1,11 @@
-no-disguise-permission: "&6You do not have access to this disguise, to use purchase at &aMyServer.net&6."
+reload-message: "&eEMCDisguises has been reloaded."
+no-disguise-permission: "&cYou do not have access to this disguise."
 click-to-use-disguise: "&eClick to use &6%entity% &edisguise&e."
 remove-disguise: "&cRemoved your &4%entity% &cdisguise."
 now-disguised: "&eYou are now disguised as a(n) &6%entity%&e."
 disguise-display-name: "&6%entity% &eDisguise"
 disguise-gui-title: "&bEMC &3Disguises"
+disguise-gui-no-permission-on-exit: "&6You do not have access to this disguise, to use purchase at &aMyServer.net&6."
 disguise-gui-undisguise-button: "&cUndisguise"
 disguise-gui-undisguise-button-lore:
   - "&eUndisguises you."
