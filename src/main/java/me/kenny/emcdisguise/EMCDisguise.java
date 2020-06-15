@@ -438,6 +438,7 @@ public class EMCDisguise extends JavaPlugin {
             player.sendMessage(localeNowDisguised);
 
             MobDisguise mobDisguise = new MobDisguise(disguiseType);
+            mobDisguise.setHideArmorFromSelf(false);
             mobDisguise.setViewSelfDisguise(false);
             mobDisguise.setEntity(player);
             mobDisguise.startDisguise();
