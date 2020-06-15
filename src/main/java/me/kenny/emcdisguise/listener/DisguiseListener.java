@@ -19,7 +19,7 @@ public class DisguiseListener implements Listener {
 
     @EventHandler
     public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
-        if (event.getEntity() instanceof Player) {
+        if (event.getEntity() instanceof Player && event.getDamager() instanceof Player) {
             Player player = (Player) event.getEntity();
             if (emcDisguise.isDisguised(player)) {
                 String disguise = emcDisguise.getPlayerDisguiseType(player).toString();

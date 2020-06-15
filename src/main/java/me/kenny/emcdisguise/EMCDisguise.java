@@ -436,15 +436,18 @@ public class EMCDisguise extends JavaPlugin {
             String entity = WordUtils.capitalizeFully(disguiseType.toString().replace("_", " "));
             String localeNowDisguised = ChatColor.translateAlternateColorCodes('&', getLocaleNowDisguised().replace("%entity%", entity));
             player.sendMessage(localeNowDisguised);
+
             MobDisguise mobDisguise = new MobDisguise(disguiseType);
-            if (isShowSelf(player))
-                mobDisguise.setViewSelfDisguise(false);
+            mobDisguise.setViewSelfDisguise(false);
             mobDisguise.setEntity(player);
             mobDisguise.startDisguise();
 
             armorStandConstructor.addArmorstand(player);
             disguised.put(player, disguiseType);
             disguises.put(player, mobDisguise);
+
+            addShowSelf(player);
+            addNameTagToggled(player);
         }
     }
 

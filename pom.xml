@@ -9,7 +9,7 @@
     </properties>
     <groupId>me.kenny</groupId>
     <artifactId>emcdisguise</artifactId>
-    <version>0.4.0</version>
+    <version>0.4.1</version>
     <name>EMCDisguise</name>
     <description>Disguises players as entities</description>
     <build>
