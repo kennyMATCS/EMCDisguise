@@ -8,4 +8,5 @@ commands:
     aliases: [d, dis]
     description: Disguises you.
   undisguise:
+    aliases: [undis]
     description: Undisguises you.
